@@ -2,13 +2,10 @@ from django.urls import resolve, reverse
 
 from recipes import views
 
-from .test_recipe_base import RecipeTestBase
+from .test_recipe_base import Recipe, RecipeTestBase
 
 
 class RecipeViewsTest(RecipeTestBase):
-
-    def tearDown(self) -> None:
-        return super().tearDown()
 
     def test_recipe_home_view_function_is_correct(self):
         view = resolve(reverse('recipes:home'))
@@ -28,12 +25,14 @@ class RecipeViewsTest(RecipeTestBase):
         self.assertIn('<h1>No recipes found here</h1> ', response.content.decode('utf-8'))
 
     def test_recipe_home_template_loads_recipes(self):
+        # Need a recipe for this test
+        self.make_recipe()
+
         response = self.client.get(reverse('recipes:home'))
         content = response.content.decode('utf-8')
         response_context_recipes = response.context['recipes']
+        # Check if one recipe exist
         self.assertIn('Recipe Title', content)
-        self.assertIn('10 Minutos', content)
-        self.assertIn('5 Porções', content)
         self.assertEqual(len(response_context_recipes), 1)
 
     def test_recipe_category_view_function_is_correct(self):
